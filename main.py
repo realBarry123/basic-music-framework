@@ -11,7 +11,7 @@ class Note():
     def __str__(self):
         return f"Note(frequency={self.frequency}, duration={self.duration})"
 
-    def __generate(self):
+    def _generate(self):
 
         samples = np.linspace(0, self.duration, int(44100 * self.duration), endpoint=False)
 
@@ -25,13 +25,12 @@ class Note():
 
     def export(self, file_name):
 
-        wavfile.write(file_name, 44100, self.__generate())
-
+        wavfile.write(file_name, 44100, self._generate())
 
 
 class Voice():
     def __init__(self, notes=[]):
-        self.notes = notes
+        self.notes = notes.copy()
 
     def __add__(self, other):
         self.notes.append(other)
@@ -40,10 +39,19 @@ class Voice():
     def __str__(self):
         return "Voice([" + ", ".join([str(note) for note in self.notes]) + "])"
 
+    def _generate(self):
+
+        combined = [note._generate() for note in self.notes]
+
+        return np.concatenate(combined) * 0.1 / np.max(combined)
+
+    def export(self, file_name):
+
+        wavfile.write(file_name, 44100, self._generate())
 
 class Chorus():
     def __init__(self, voices=[]):
-        self.voices = voices
+        self.voices = voices.copy()
 
     def __add__(self, other):
         self.voices.append(other)
@@ -52,11 +60,49 @@ class Chorus():
     def __str__(self):
         return "Chorus([\n  " + ", \n  ".join(str(voice) for voice in self.voices) + "\n])"
 
-voice = Voice()
-voice += Note(440, 1)
-voice += Note(440, 1)
+    def _generate(self):
+
+        voices = [voice._generate() for voice in self.voices]
+
+        max_len = 0
+        for voice in voices:
+            if len(voice) > max_len:
+                max_len = len(voice)
+
+        combined = np.zeros(max_len)
+
+        for voice in voices:
+            zeros = np.zeros(max_len-len(voice))  # fill in the zeros
+            combined = np.add(combined, np.concatenate((voice, zeros)))
+
+        return combined
+
+    def export(self, file_name):
+
+        wavfile.write(file_name, 44100, self._generate())
+
+voice1 = Voice()
+voice1 += Note(440, 1)
+voice1 += Note(420, 1)
+voice1 += Note(440, 1)
+voice1 += Note(440, 1)
+
+voice2 = Voice()
+voice2 += Note(550, 1)
+voice2 += Note(587.33, 1)
+voice2 += Note(587.33, 1)
+voice2 += Note(550, 1)
+
+
+voice3 = Voice()
+voice3 += Note(220, 1)
+voice3 += Note(165, 1)
+voice3 += Note(175, 1)
+voice3 += Note(165, 1)
+
+
 chorus = Chorus()
-chorus += voice
-chorus += voice
-print(chorus)
-Note(440, 1).export("hello.wav")
+chorus += voice1
+chorus += voice2
+chorus += voice3
+chorus.export("hello.wav")
