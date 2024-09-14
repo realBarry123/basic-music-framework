@@ -80,7 +80,7 @@ class Chorus():
     def export(self, file_name):
 
         wavfile.write(file_name, 44100, self._generate())
-
+'''
 voice1 = Voice()
 voice1 += Note(440, 1)
 voice1 += Note(420, 1)
@@ -106,3 +106,9 @@ chorus += voice1
 chorus += voice2
 chorus += voice3
 chorus.export("hello.wav")
+'''
+
+voice = Voice()
+voice += Note(440, 1)
+voice += Note(440, 2)
+voice.export("hello.wav")
