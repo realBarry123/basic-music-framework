@@ -4,9 +4,10 @@ import scipy
 from scipy.io import wavfile
 
 class Note():
-    def __init__(self, _freq, _dur):
+    def __init__(self, _freq, _dur, type="sin"):
         self.frequency = _freq
         self.duration = _dur
+        self.type = type
 
     def __str__(self):
         return f"Note(frequency={self.frequency}, duration={self.duration})"
@@ -15,7 +16,17 @@ class Note():
 
         samples = np.linspace(0, self.duration, int(44100 * self.duration), endpoint=False)
 
-        sig = np.sin(2 * np.pi * self.frequency * samples)
+        if self.type == "sin":
+            sig = np.sin(2 * np.pi * self.frequency * samples)
+
+        elif self.type == "sqr":
+            sig = scipy.signal.square(2 * np.pi * self.frequency * samples)
+
+        elif self.type == "tri":
+            sig = scipy.signal.sawtooth(2 * np.pi * self.frequency * samples, 0.5)
+
+        elif self.type == "saw":
+            sig = scipy.signal.sawtooth(2 * np.pi * self.frequency * samples, 1)
 
         sig *= 32767
 
@@ -42,8 +53,12 @@ class Voice():
     def _generate(self):
 
         combined = [note._generate() for note in self.notes]
+        for i in combined:
+            print(len(i))
 
-        return np.concatenate(combined) * 0.1 / np.max(combined)
+        concated = np.concatenate(combined)
+        return concated * 0.1 / np.max(concated)
+
 
     def export(self, file_name):
 
@@ -80,35 +95,3 @@ class Chorus():
     def export(self, file_name):
 
         wavfile.write(file_name, 44100, self._generate())
-'''
-voice1 = Voice()
-voice1 += Note(440, 1)
-voice1 += Note(420, 1)
-voice1 += Note(440, 1)
-voice1 += Note(440, 1)
-
-voice2 = Voice()
-voice2 += Note(550, 1)
-voice2 += Note(587.33, 1)
-voice2 += Note(587.33, 1)
-voice2 += Note(550, 1)
-
-
-voice3 = Voice()
-voice3 += Note(220, 1)
-voice3 += Note(165, 1)
-voice3 += Note(175, 1)
-voice3 += Note(165, 1)
-
-
-chorus = Chorus()
-chorus += voice1
-chorus += voice2
-chorus += voice3
-chorus.export("hello.wav")
-'''
-
-voice = Voice()
-voice += Note(440, 1)
-voice += Note(440, 2)
-voice.export("hello.wav")
