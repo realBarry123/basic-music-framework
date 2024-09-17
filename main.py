@@ -34,6 +34,12 @@ class Note:
         elif self.signal_type == "saw":
             sig = scipy.signal.sawtooth(2 * np.pi * self.frequency * samples, 1)
 
+        else:
+            raise ValueError(
+                f"Unrecognized signal type '{self.signal_type}'. "
+                f"Try one these instead: 'sin', 'sqr', 'tri', 'saw'."
+            )
+
         sig *= 32767
 
         sig = np.int16(sig)
