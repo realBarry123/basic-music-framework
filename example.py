@@ -1,9 +1,9 @@
 from main import *
 
 voice1 = Voice()
-voice1 += Note(440, 1, type="tri")
-voice1 += Note(420, 1, type="tri")
-voice1 += Note(440, 4, type="tri")
+voice1 += Note(440, 1, signal_type="tri")
+voice1 += Note(420, 1, signal_type="tri")
+voice1 += Note(440, 4, signal_type="tri")
 
 voice2 = Voice()
 voice2 += Note(550, 1)
