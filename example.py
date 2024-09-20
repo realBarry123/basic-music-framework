@@ -41,3 +41,7 @@ chorus += voice2
 chorus += voice3
 chorus += voice4
 chorus.export("hello.wav")
+
+voice = Voice()
+voice += Note(440, 1, signal_type="noise")
+voice.export("noise.wav")

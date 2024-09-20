@@ -34,6 +34,9 @@ class Note:
         elif self.signal_type == "saw":
             sig = scipy.signal.sawtooth(2 * np.pi * self.frequency * samples, 1)
 
+        elif self.signal_type == "noise":
+            sig = np.random.normal(0, 1, size=int(self.duration * 44100))
+
         else:
             raise ValueError(
                 f"Unrecognized signal type '{self.signal_type}'. "
